@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>First Phaser Game</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="scripts.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+            font: helvetica;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- <script>
+
+        let config = {
+            type: Phaser.AUTO,
+            parent: 'content',
+            width: 1200,
+            height: 800,
+            scene: {
+                key: 'main',
+                preload: preload,
+                create: create,
+                update: update
+            },
+        };
+
+        let graphics;
+        let path;
+
+        function preload() {
+            this.load.atlas("towers", "./sprites/TD/towers.png", "./sprites/TD/towers.json");
+            this.load.image("bullet", "./sprites/player/player_idle.png");
+        }
+
+        var ENEMY_SPEED = 1/10000;
+        var Enemy = new Phaser.Class({
+
+            extends: Phaser.GameObjects.Image,
+
+            initialize:
+
+            function Enemy (scene) {
+                Phaser.GameObjects.Image.call(this, scene, 0, 0, 'towers', 'enemy');
+                this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
+            },
+
+            update: function (time, delta) {
+                // move the t point along the path, 0 is the start and 0 is the end
+                this.follower.t += ENEMY_SPEED * delta;
+                
+                // get the new x and y coordinates in vec
+                path.getPoint(this.follower.t, this.follower.vec);
+                
+                // update enemy x and y to the newly obtained x and y
+                this.setPosition(this.follower.vec.x, this.follower.vec.y);
+                // if we have reached the end of the path, remove the enemy
+                if (this.follower.t >= 1) {
+                    this.setActive(false);
+                    this.setVisible(false);
+                }
+            },
+
+            startOnPath: function ()
+            {
+                // set the t parameter at the start of the path
+                this.follower.t = 0;
+                
+                // get x and y of the given t point            
+                path.getPoint(this.follower.t, this.follower.vec);
+                
+                // set the x and y of our enemy to the received from the previous step
+                this.setPosition(this.follower.vec.x, this.follower.vec.y);
+                
+            },
+
+        })
+
+        function create() {
+            let graphics = this.add.graphics();
+
+            path = this.add.path(96,-32);
+            path.lineTo(96, 164);
+            path.lineTo(480, 164);
+            path.lineTo(480, 544);
+
+            graphics.lineStyle(3, 0xffffff, 1);
+
+            path.draw(graphics);
+
+            enemies = this.add.group({ classType: Enemy, runChildUpdate: true });
+            this.nextEnemy = 0;
+        }
+        
+        function update(time, delta) {  
+            // if its time for the next enemy
+            if (time > this.nextEnemy)
+            {        
+                var enemy = enemies.get();
+                if (enemy)
+                {
+                    enemy.setActive(true);
+                    enemy.setVisible(true);
+                    
+                    // place the enemy at the start of the path
+                    enemy.startOnPath();
+                    
+                    this.nextEnemy = time + 2000;
+                }       
+            }
+        }
+
+        const game = new Phaser.Game(config);
+    
+    </script> -->
+
+</body>
+</html>
