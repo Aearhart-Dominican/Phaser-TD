@@ -1,17 +1,21 @@
-var map =      [[ 0,-1, 0, 0, 0, 0, 0, 0, 0, 0],
-                [ 0,-1, 0, 0, 0, 0, 0, 0, 0, 0],
-                [ 0,-1,-1,-1,-1,-1,-1,-1, 0, 0],
-                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0],
-                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0],
-                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0],
-                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0],
-                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0]];
+var map =      [[ 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [ 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1, 0, 0],
+                [ 0,-1, 0, 0, 0,-1,-1,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0,-1, 0, 0],
+                [ 0,-1, 0, 0, 0,-1, 0,-1, 0, 0, 0, 0, 0, 0,-1,-1, 0,-1, 0, 0],
+                [ 0,-1, 0, 0, 0,-1, 0,-1, 0,-1,-1,-1,-1, 0, 0,-1, 0,-1, 0, 0],
+                [ 0,-1, 0, 0, 0,-1, 0,-1, 0,-1, 0, 0,-1, 0, 0,-1, 0,-1, 0, 0],
+                [ 0,-1, 0, 0, 0,-1, 0,-1, 0,-1, 0, 0,-1, 0, 0,-1, 0,-1, 0, 0],
+                [ 0,-1,-1,-1,-1,-1, 0,-1, 0,-1,-1,-1,-1,-1,-1,-1, 0,-1, 0, 0],
+                [ 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0,-1, 0, 0, 0, 0,-1, 0, 0],
+                [ 0, 0, 0, 0, 0, 0, 0,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0,-1, 0, 0],
+                [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1,-1,-1],
+                [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
 var config = {
     type: Phaser.AUTO,
     parent: 'content',
-    width: 640,
-    height: 512,
+    width: 1280,
+    height: 832,
     physics: {
         default: 'arcade'
     },
@@ -22,12 +26,18 @@ var config = {
         update: update
     }
 };
+
 var game = new Phaser.Game(config);
 var graphics;
 var path;
+var wave = [[6, 2000], [6, 2000], [8, 1800], [4, 1000], [15, 1800], [4, 500]]
+var waveNum = 0
 var money = 100;
 var moneyText;
-var spawnTime = 2000;
+var count = wave[0][0];
+var spawnTime = wave[0][1];
+var baseHp = 20;
+var baseHpText;
 
 function preload() {
     // load the game assets – enemy and turret atlas
@@ -43,7 +53,8 @@ var Enemy = new Phaser.Class({
     {
         Phaser.GameObjects.Image.call(this, scene, 0, 0, 'sprites', 'ghost');
         this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
-        this.ENEMY_SPEED = 1/10000;
+        this.ENEMY_SPEED = 1/25000;
+        this.hp = 100;
     },
     
     startOnPath: function ()
@@ -56,8 +67,6 @@ var Enemy = new Phaser.Class({
         
         // set the x and y of our enemy to the received from the previous step
         this.setPosition(this.follower.vec.x, this.follower.vec.y);
-
-        this.hp = 100;
     },
 
     receiveDamage: function(damage) {
@@ -86,6 +95,7 @@ var Enemy = new Phaser.Class({
         {
             this.setActive(false);
             this.setVisible(false);
+            reachedEnd(this);
         }
     }
 });
@@ -166,10 +176,24 @@ function create() {
     // the path for our enemies
     // parameters are the start x and y of our path
     path = this.add.path(96, -32);
-    path.lineTo(96, 164);
-    path.lineTo(480, 164);
-    path.lineTo(480, 544);
-    
+    path.lineTo(96, 480);
+    path.lineTo(352, 480);
+    path.lineTo(352, 160);
+    path.lineTo(484, 160);
+    path.lineTo(484, 608);
+    path.lineTo(804, 608);
+    path.lineTo(804, 608);
+    path.lineTo(804, 288);
+    path.lineTo(612, 288);
+    path.lineTo(612, 480);
+    path.lineTo(996, 480);
+    path.lineTo(996, 224);
+    path.lineTo(932, 224);
+    path.lineTo(932, 96);
+    path.lineTo(1124, 96);
+    path.lineTo(1124, 672);
+    path.lineTo(1284, 672);
+
     graphics.lineStyle(3, 0xffffff, 1);
     // visualize the path
     path.draw(graphics);
@@ -184,15 +208,20 @@ function create() {
     
     this.physics.add.overlap(enemies, bullets, damageEnemy);
 
-    moneyText = this.add.text(16, 480, 'Cash: 0', { fontSize: '32px', fill: '#0ff' });
+    moneyText = this.add.text(16, 804, 'Cash: 0', { fontSize: '32px', fill: '#0ff' });
+    baseHpText = this.add.text(1050, 804, 'Health: 20', { fontSize: '32px', fill: '#0ff' });
 }
  
 function update(time, delta) {  
+    if (waveNum > wave.length - 1) {
+        waveNum = wave.length - 1
+    }
+
     // if its time for the next enemy
     if (time > this.nextEnemy)
     {        
         var enemy = enemies.get();
-        if (enemy)
+        if (enemy && count > 0)
         {
             enemy.setActive(true);
             enemy.setVisible(true);
@@ -200,8 +229,12 @@ function update(time, delta) {
             // place the enemy at the start of the path
             enemy.startOnPath();
             
-            this.nextEnemy = time + spawnTime;
-        }       
+            this.nextEnemy = time + wave[waveNum][1];
+            count -= 1
+        } else {
+            count = wave[waveNum][0]
+            waveNum += 1
+        }      
     }
 
     moneyText.setText('Cash: ' + money)
@@ -209,13 +242,13 @@ function update(time, delta) {
 
 function drawGrid(graphics) {
     graphics.lineStyle(1, 0x0000ff, 0.8);
-    for(var i = 0; i < 8; i++) {
+    for(var i = 0; i < 13; i++) {
         graphics.moveTo(0, i * 64);
-        graphics.lineTo(640, i * 64);
+        graphics.lineTo(1280, i * 64);
     }
-    for(var j = 0; j < 10; j++) {
+    for(var j = 0; j < 20; j++) {
         graphics.moveTo(j * 64, 0);
-        graphics.lineTo(j * 64, 512);
+        graphics.lineTo(j * 64, 768);
     }
     graphics.strokePath();
 }
@@ -275,4 +308,16 @@ function damageEnemy(enemy, bullet) {
 
 function enemyDead(enemy) {
     money += 10
+}
+
+function reachedEnd (enemy) {
+ baseHp -= 1
+ baseHpText.setText('Health: ' + baseHp)
+ if (baseHp < 0) {
+    gameOver();
+ }
+}
+
+function gameOver() {
+
 }
