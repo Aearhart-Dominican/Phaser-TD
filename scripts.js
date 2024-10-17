@@ -30,7 +30,7 @@ var config = {
 var game = new Phaser.Game(config);
 var graphics;
 var path;
-var wave = [[6, 2000], [6, 2000], [8, 1800], [4, 1000], [15, 1800], [4, 500]]
+var wave = [[6, 2000], [6, 2000], [8, 1800], [4, 1000], [15, 1800], [12, 500], [5, 100]]
 var waveNum = 0
 var money = 100;
 var moneyText;
@@ -256,8 +256,8 @@ function drawGrid(graphics) {
 function placeTurret(pointer) {
     var i = Math.floor(pointer.y/64);
     var j = Math.floor(pointer.x/64);
-    if (money >= 50) {
-        if(canPlaceTurret(i, j)) {
+    try {
+        if(canPlaceTurret(i, j) && money >= 50) {
             var turret = turrets.get();
             if (turret)
             {
@@ -269,6 +269,8 @@ function placeTurret(pointer) {
             money -= 50
             
         }
+    } catch (err) {
+        
     }
 }
 
